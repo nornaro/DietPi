@@ -47,7 +47,7 @@ jobs:
 
           # 2. Build the arguments string
           buildargs='${{ matrix.buildargs }}'
-          [ "${{ github.event.inputs.testkernel }}" == 'true' ] && buildargs="$buildargs --test-kernel"
+          [ "${{ github.event.inputs.testkernel }}" == 'true' ] && buildargs='-m 84 -d 8' --test-kernel"
 
           # 3. Execute the build (NOTICE: --sign and --upload-script are GONE)
           sudo bash -c "G_GITOWNER=$GITHUB_REPOSITORY_OWNER G_GITBRANCH=$GITHUB_REF_NAME; $(curl -sSf "https://raw.githubusercontent.com/$GITHUB_REPOSITORY_OWNER/DietPi/$GITHUB_REF_NAME/.build/images/dietpi-build" || echo false)" -- $buildargs

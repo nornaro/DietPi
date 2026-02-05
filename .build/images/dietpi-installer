@@ -73,6 +73,7 @@
 	elif (( $G_HW_MODEL == 84 ))
 	then
 		# Star64
+                G_HW_MODEL_NAME='Star64'
 		G_EXEC curl -fLO 'https://dietpi.com/downloads/binaries/testing/linux-image-star64.deb'
 		G_EXEC dpkg -i linux-image-star64.deb
 		rm linux-image-star64.deb
