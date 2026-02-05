@@ -1402,15 +1402,17 @@ _EOF_
 			# Force fsck repair
 			grep -q 'fsck.repair=' /boot/extlinux/extlinux.conf || G_EXEC sed --follow-symlinks -i 's/net.ifnames=0/fsck.repair=yes net.ifnames=0/' /boot/extlinux/extlinux.conf
 
-		# Star64
+                # Star64
 		elif (( $G_HW_MODEL == 84 ))
 		then
-			G_AGI linux-image-star64 libubootenv-tool
+			G_EXEC curl -fLO 'https://dietpi.com/downloads/binaries/testing/linux-image-star64.deb'
+			G_EXEC dpkg -i linux-image-star64.deb
+			rm linux-image-star64.deb
+			G_AGI libubootenv-tool
 			G_EXEC sed --follow-symlinks -i "s/root=[^[:blank:]]*/root=PARTUUID=$(findmnt -Ufnro PARTUUID -M /)/" /boot/extlinux/extlinux.conf
-			G_EXEC sed --follow-symlinks -i "s/rootfstype=[^[:blank:]]*/rootfstype=$(findmnt -Ufnro FSTYPE -M /)/" /boot/extlinux/extlinux.conf
 
-			# Force fsck repair
-			grep -q 'fsck.repair=' /boot/extlinux/extlinux.conf || G_EXEC sed --follow-symlinks -i 's/net.ifnames=0/fsck.repair=yes net.ifnames=0/' /boot/extlinux/extlinux.conf
+		# --- ADD THIS LINE BELOW ---
+		fi
 
 		# Armbian
 		elif [[ $G_HW_MODEL != 75 && $(dpkg-query -Wf '${Package} ') == *'armbian'* ]]
