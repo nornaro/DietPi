@@ -1411,9 +1411,6 @@ _EOF_
 			G_AGI libubootenv-tool
 			G_EXEC sed --follow-symlinks -i "s/root=[^[:blank:]]*/root=PARTUUID=$(findmnt -Ufnro PARTUUID -M /)/" /boot/extlinux/extlinux.conf
 
-		# --- ADD THIS LINE BELOW ---
-		fi
-
 		# Armbian
 		elif [[ $G_HW_MODEL != 75 && $(dpkg-query -Wf '${Package} ') == *'armbian'* ]]
 		then
