@@ -61,16 +61,7 @@
 	G_EXEC curl -sSfLO "https://github.com/MichaIng/DietPi/archive/$G_GITBRANCH.tar.gz"
 	dir="DietPi-${G_GITBRANCH//\//-}"
 	tar xf "${G_GITBRANCH##*/}.tar.gz"
-
-	# Hardware specific boot configs (RV64 ONLY)
-	if (( $G_HW_MODEL == 81 ))
-	then
-		# VisionFive 2
-		G_AGI linux-image-visionfive2 libubootenv-tool
-		G_EXEC sed --follow-symlinks -i "s/root=[^[:blank:]]*/root=PARTUUID=$(findmnt -Ufnro PARTUUID -M /)/" /boot/extlinux/extlinux.conf
-		G_EXEC sed --follow-symlinks -i "s/rootfstype=[^[:blank:]]*/rootfstype=$(findmnt -Ufnro FSTYPE -M /)/" /boot/extlinux/extlinux.conf
-
-	elif (( $G_HW_MODEL == 84 ))
+	if (( $G_HW_MODEL == 84 ))
 	then
 		# Star64
                 G_HW_MODEL_NAME='Star64'
