@@ -133,7 +133,7 @@ jobs:
     needs: prep
     strategy:
       matrix:
-        buildargs: ${{ fromJson(needs.prep.outputs.buildargs) }}
+        buildargs: ["-m 16 -d 8"]
       fail-fast: false
     name: "Build: ${{ matrix.buildargs }}"
     runs-on: ${{ ( contains(matrix.buildargs, '-m 20') || contains(matrix.buildargs, '-m 21') || contains(matrix.buildargs, '-a 10') ) && 'ubuntu-24.04' || 'ubuntu-24.04-arm' }}
