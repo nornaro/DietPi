@@ -30,13 +30,13 @@
 		dpkg-query -s "$i" &> /dev/null || apt-get -y install "$i"
 	done
 
-	# Detect Architecture
-	G_HW_ARCH_NAME=$(uname -m)
-	if [[ $G_HW_ARCH_NAME == 'riscv64' ]]
+        G_HW_ARCH_NAME=$(uname -m)
+	# Allow riscv64 native OR aarch64/x86_64 hosts (for cross-building)
+	if [[ $G_HW_ARCH_NAME == 'riscv64' || $G_HW_ARCH_NAME == 'aarch64' || $G_HW_ARCH_NAME == 'x86_64' ]]
 	then
 		G_HW_ARCH=11
 	else
-		echo "[FAILED] Unsupported CPU architecture: \"$G_HW_ARCH_NAME\". This script is rv64 only."
+		echo "[FAILED] Unsupported CPU architecture: \"$G_HW_ARCH_NAME\"."
 		exit 1
 	fi
 
@@ -78,6 +78,7 @@
 		rm linux-image-star64.deb
 		G_AGI libubootenv-tool
 		G_EXEC sed --follow-symlinks -i "s/root=[^[:blank:]]*/root=PARTUUID=$(findmnt -Ufnro PARTUUID -M /)/" /boot/extlinux/extlinux.conf
+                G_EXEC bash -c "echo 'bash <(curl -s https://install.felix86.com)' >> /var/lib/dietpi/post-inst.sh"
 	fi
 
 	# Finalize Installation (Standard DietPi cleanup)
