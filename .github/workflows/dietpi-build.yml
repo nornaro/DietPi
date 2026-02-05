@@ -25,7 +25,7 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.buildargs }}" = 'rv64' ]
           then
-            echo 'buildargs=["-m 16 -d 8", "-m 15 -d 8"]' >> "$GITHUB_OUTPUT"
+            echo 'buildargs=["-m 84 -d 9"]' >> "$GITHUB_OUTPUT"
           else
             echo 'buildargs=["${{ github.event.inputs.buildargs }}"]' >> "$GITHUB_OUTPUT"
           fi
@@ -46,7 +46,7 @@ jobs:
           echo 'nameserver 1.1.1.1' | sudo tee /etc/resolv.conf > /dev/null
 
           # 2. Build the arguments string
-          buildargs='-m 84 -d 8'
+          buildargs='-m 84 -d 9'
           [ "true" == 'true' ] && buildargs="$buildargs --test-kernel"
 
           # 3. Execute the build (NOTICE: --sign and --upload-script are GONE)
