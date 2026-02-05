@@ -1402,37 +1402,21 @@ _EOF_
 			# Force fsck repair
 			grep -q 'fsck.repair=' /boot/extlinux/extlinux.conf || G_EXEC sed --follow-symlinks -i 's/net.ifnames=0/fsck.repair=yes net.ifnames=0/' /boot/extlinux/extlinux.conf
 
-		# Star64
+# Star64
 		elif (( $G_HW_MODEL == 84 ))
 		then
-			G_AGI linux-image-star64 libubootenv-tool
+			# Download the specific 6.18.6 testing kernel you found
+			G_EXEC curl -fLO 'https://dietpi.com/downloads/binaries/testing/linux-image-star64.deb'
+			# Install it manually
+			G_EXEC dpkg -i linux-image-star64.deb
+			# Clean up the deb file
+			rm linux-image-star64.deb
+
+			# Ensure other dependencies are met
+			G_AGI libubootenv-tool
+
+			# The existing boot config logic follows...
 			G_EXEC sed --follow-symlinks -i "s/root=[^[:blank:]]*/root=PARTUUID=$(findmnt -Ufnro PARTUUID -M /)/" /boot/extlinux/extlinux.conf
-			G_EXEC sed --follow-symlinks -i "s/rootfstype=[^[:blank:]]*/rootfstype=$(findmnt -Ufnro FSTYPE -M /)/" /boot/extlinux/extlinux.conf
-
-			# Force fsck repair
-			grep -q 'fsck.repair=' /boot/extlinux/extlinux.conf || G_EXEC sed --follow-symlinks -i 's/net.ifnames=0/fsck.repair=yes net.ifnames=0/' /boot/extlinux/extlinux.conf
-
-		# Armbian
-		elif [[ $G_HW_MODEL != 75 && $(dpkg-query -Wf '${Package} ') == *'armbian'* ]]
-		then
-			# Prevent any unintended packages from being installed from Armbian's APT repository, like base-files: https://github.com/MichaIng/DietPi/issues/6227#issuecomment-1713688577
-			cat << '_EOF_' > /etc/apt/preferences.d/dietpi-armbian
-Package: *
-Pin: origin apt.armbian.com
-Pin-Priority: -1
-
-Package: armbian-firmware* linux-*
-Pin: origin apt.armbian.com
-Pin-Priority: 500
-_EOF_
-			if dpkg --compare-versions "$(dpkg-query -Wf '${Version}' base-files)" gt 20
-			then
-				G_DIETPI-NOTIFY 2 'Enforcing downgrade of Armbian'\''s base-files package to Debian'\''s'
-				cat << '_EOF_' > /etc/apt/preferences.d/dietpi-armbian-tmp
-Package: base-files
-Pin: release o=Debian
-Pin-Priority: 1000
-_EOF_
 				G_EXEC eval 'echo '\''APT::Get::Allow-Downgrades "1";'\'' > /etc/apt/apt.conf.d/dietpi-armbian'
 			fi
 
@@ -1457,23 +1441,21 @@ _EOF_
 			(( $G_HW_ARCH == 3 )) && arch='arm64'
 			G_EXEC mkdir -p /etc/kernel/post{inst,rm}.d /etc/initramfs/post-update.d
 			cat << _EOF_ > /etc/initramfs/post-update.d/99-dietpi-uboot
-#!/bin/dash -e
-echo 'update-initramfs: Converting to U-Boot format'
-mkimage -A $arch -O linux -T ramdisk -C gzip -n uInitrd -d "\$2" "/boot/uInitrd-\$1"
-ln -sfv "uInitrd-\$1" /boot/uInitrd || mv -v "/boot/uInitrd-\$1" /boot/uInitrd
-exit 0
-_EOF_
-			G_EXEC chmod +x /etc/initramfs/post-update.d/99-dietpi-uboot
-			cat << '_EOF_' > /etc/kernel/postinst.d/dietpi-initramfs_cleanup
-#!/bin/dash -e
-echo 'Removing obsolete initramfs images'
-find /boot -maxdepth 1 -name 'initrd.img-*' -o -name 'uInitrd-*' | while read -r f
-do
-	[ ! -d "/lib/modules/${f#*-}" ] || continue
-	rm -v "$f"
-done
-exit 0
-_EOF_
+                # Star64
+		elif (( $G_HW_MODEL == 84 ))
+		then
+			# Download the specific 6.18.6 testing kernel you found
+			G_EXEC curl -fLO 'https://dietpi.com/downloads/binaries/testing/linux-image-star64.deb'
+			# Install it manually
+			G_EXEC dpkg -i linux-image-star64.deb
+			# Clean up the deb file
+			rm linux-image-star64.deb
+
+			# Ensure other dependencies are met
+			G_AGI libubootenv-tool
+
+			# The existing boot config logic follows...
+			G_EXEC sed --follow-symlinks -i "s/root=[^[:blank:]]*/root=PARTUUID=$(findmnt -Ufnro PARTUUID -M /)/" /boot/extlinux/extlinux.conf
 			G_EXEC chmod +x /etc/kernel/postinst.d/dietpi-initramfs_cleanup
 			G_EXEC ln -sf /etc/kernel/post{inst,rm}.d/dietpi-initramfs_cleanup
 			# Pre-v8.4
